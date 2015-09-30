@@ -1,136 +1,46 @@
 <!DOCTYPE html>
 <html ldir="ltr" lang="en-US" class="no-js">
 <head>
-	<meta charset="UTF-8" />
+<!--
+  BBBBBBBBBBBBBBBBBBB  CCCCCCCCCCCCCCCCCCC        MMMMMMMMMM             HHHHHHHHHM
+  B                 B  C                 C      MM          MM         HH          HH
+  B                 B  C                 C     M              M       H              H
+  B     BBBBBBB     B  C      CCCCC      C    M  M          M  M     H    H      H    H
+  B     BB    BB    B  C    CC     CC    C   M   MM        MM   M   H     H      H     H
+  B     BB    BB    B  C   CC            C   M   M M      M M   M   H     H      H     H
+  B     BBBBBBB     B  C   CC            C   M   M  M    M  M   M   H     HHHHHHHH     H
+  B     BB    BB    B  C   CC            C   M   M  M    M  M   M   H     H      H     H
+  B     BB    BB    B  C    CC     CC    C   M   M   M  M   M   M   H     H      H     H
+  B     BBBBBBB     B  C      CCCCC      C    M  M    MM    M  M     H    H      H    H
+  B                 B  C                 C     MM             M       H             HH
+  B                 B  C                 C       MM         MM         HH          HH
+  BBBBBBBBBBBBBBBBBBB  CCCCCCCCCCCCCCCCCCC         MMMMMMMMM             HHHHHHHHHH
+
+  Bravo Charlie Mike Hotel
+  http://bcmh.co.uk
+--><meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1.0" />
 
-	<title>Show Me</title>
+	<title>Show Me Bravo Charlie Mike Hotel</title>
 
-	<style>
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-		}
-
-		html, body {
-			background: #eee;
-			overflow: hidden;
-			background-image:
-		      -moz-linear-gradient(45deg, #ddd 25%, transparent 25%), 
-		      -moz-linear-gradient(-45deg, #ddd 25%, transparent 25%),
-		      -moz-linear-gradient(45deg, transparent 75%, #ddd 75%),
-		      -moz-linear-gradient(-45deg, transparent 75%, #ddd 75%);
-		    background-image:
-		      -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, #ddd), color-stop(.25, transparent)), 
-		      -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, #ddd), color-stop(.25, transparent)),
-		      -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, #ddd)),
-		      -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, #ddd));
-
-		       -moz-background-size:20px 20px;
-		            background-size:20px 20px;
-		    -webkit-background-size:20px 21px; /* override value for shitty webkit */
-		    
-		    background-position:0 0, 10px 0, 10px -10px, 0px 10px;
-		}
-
-		#Frame {
-			background: rgba(255,0,0,0.5);
-			width: 10em;
-			height: 20em;
-			top: 1em;
-			left: 1em;
-			transition: 250ms ease all;
-			transform-origin: 0 0;
-			position: relative;
-		}
-
-		#Frame iframe {
-			background: #fff;
-			border: 0;
-			position: absolute;
-			top: 0;
-			left: 0;
-			height: 100%;
-			width: 100%;
-			border: 1px solid #ccc;
-			border-radius: 1px solid red;
-		}
-
-		.fr-wrap {
-			
-			display: inline-block;
-		}
-
-		#Details {
-			position: fixed;
-			bottom: 0;
-			right: 0;
-			background: #fff;
-			padding: .5em;
-			font-family: monospace;
-		}
-
-		.controls {
-			background: #fff;
-			position: fixed;
-			top: 0;
-			right: 0;
-			width: 15em;
-			padding: .5em;
-			transition: 250ms ease all;
-			transform: translateX(15em);
-		}
-
-			.controls .sm-open {
-				margin-top: -1em;
-				margin-left: -4em;
-				transition: 180ms ease all;
-			}
-
-			#Controls:target {
-				transform: none;
-			}
-
-				#Controls:target .sm-open {
-					opacity: 0;
-				}
-
-			.controls header {
-			}
-
-			.controls textarea,
-			.controls input {
-				font-family: monospace;
-				padding: .5em;
-			}
-
-			.controls header a {
-				display: inline-block;
-				background: yellow;
-				padding: .5em;
-				text-decoration: none;
-			}
-
-			.controls > * {
-				width: 100%;
-				margin-bottom: .5em;
-				font-size: 1rem;
-			}
-	
-	</style>
+	<link rel="stylesheet" type="text/css" href="style.css"/>
 
 </head>
 <body>
 	<div class="fr-wrap">
 		<div id="Frame"><iframe id="iFrame"></iframe></div>
-		<div id="Details"></div>
+		<div id="InlineControls" class="controls-inline">
+			<div id="Details"></div>
+			<button>Next</button>
+			<button>Pause</button>
+			<button>Prev</button>
+		</div>
 	</div>
 
 
 	<div id="Controls" class="controls">
 		<header>
-			<a href="#n\a" class="sm-close">-</a>
+			<a href="#n\a" class="sm-close">&times;</a>
 			<a href="#Controls" class="sm-open">+</a>
 		</header><!-- /header -->
 	
@@ -139,7 +49,7 @@
 		<label for="sizes">Sizes</label>
 		<textarea name="sizes" id="Sizes" cols="30" rows="10">1920x1080|1366x768|1440x900|1280x800|320x568|2560x1440|1680x1050|1280x1024|1600x900|768x1024|360x640|375x667|1920x1200|1536x864|1024x768|1280x720|1280x752|320x480|414x736|1143x643|1152x864|1188x668|1344x840|1347x1078|1600x1200|1067x600|1185x667|1684x947|1821x1024|1829x1029|377x628|396x660|800x600|1024x600|1024x746|1024x819|1093x614|1100x860|1103x621|1229x691|1280x768|1301x731|1400x1050|1518x853|1708x960|2048x1152|2087x1174|320x534|320x570|480x800|505x505</textarea>
 
-		<input id="UpdateUrl" type="Submit"/>
+		<input id="UpdateUrl" type="submit" value="update"/>
 
 	</div>
 	<script src="showMe.js"></script>
