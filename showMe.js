@@ -36,13 +36,19 @@ var ShowMe = function() {
   return this;
 };
 
+ShowMe.prototype.getPercentage = function(scalar) {
+  return scalar === 1 ? 100 : (scalar * 100).toPrecision(2);
+};
+
 ShowMe.prototype.stepSize = function() {
   var _self = this;
 
   var s = _self.sizes[_self.sizePointer];
 
-  if (s)
-  _self.setSize( s[0], s[1] );
+  if (s) {
+    _self.setSize( s[0], s[1] );
+    this.Details.innerHTML = (_self.sizePointer + 1) + '. ' + s[0] + '&times' + s[1] + 'px / ' + _self.getPercentage( this.scalar ) + '%';
+  }
 
   if (_self.sizePointer < _self.sizes.length ) {
     _self.sizePointer++;
@@ -106,8 +112,6 @@ ShowMe.prototype.setSize = function(w, h) {
   this.Frame.style.height = h + 'px';
 
   this.resize(w, h);
-  this.Details.innerHTML = w + '&times' + h + 'px / ' + (this.scalar * 100).toPrecision(2) + '%';
-
 };
 
 ShowMe.prototype.getScalar = function( targetSize ) {
