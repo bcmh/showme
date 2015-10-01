@@ -14,16 +14,30 @@ var ShowMe = function() {
   _self.Url = document.getElementById('Url');
   _self.iFrame = document.getElementById('iFrame');
   _self.update = document.getElementById('UpdateUrl');
+  _self.next = document.getElementById('SNext');
+  _self.prev = document.getElementById('SPrev');
+  _self.pause = document.getElementById('SPause');
 
   _self.frameSize = {
     width: _self.Frame.offsetWidth,
     height: _self.Frame.offsetHeight
   };
 
+  _self.pause.addEventListener('click', function() {
+    var inner = _self.pause.innerText.toLowerCase();
+
+    if ( inner === 'pause' ) {
+      clearTimeout(_self.timer);
+      _self.pause.innerText = 'play';
+    } else {
+      _self.pause.innerText = 'pause';
+      _self.timer = _self.stepSize();
+    }
+  }, false);
+
   _self.update.addEventListener('click', function() {
     _self.updateUrl();
-  }, false )
-
+  }, false );
 
   _self.updateUrl();
   // Calculate Scale
@@ -52,7 +66,7 @@ ShowMe.prototype.stepSize = function() {
 
   if (_self.sizePointer < _self.sizes.length ) {
     _self.sizePointer++;
-    setTimeout(function() {
+    _self.timer = setTimeout(function() {
       _self.stepSize();
     }, 4000 );
   }
@@ -89,6 +103,11 @@ ShowMe.prototype.containDimensions = function ( child_w, child_h, container_w, c
 };
 
 ShowMe.prototype.getUrl = function() {
+
+  if (window.location.hash.length > 2) {
+    return window.location.hash.replace('#', '');
+  } 
+
   return this.Url.value;
 };
 
