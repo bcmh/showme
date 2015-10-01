@@ -32,8 +32,10 @@ html, body {
 	top: 1em;
 	left: 1em;
 	box-shadow: 0 .5em 1.5em rgba( 0, 0, 0,.25);
-	transition: 250ms ease all;
-	transform-origin: 0 0;
+	-webkit-transition: 250ms ease all;
+			transition: 250ms ease all;
+	-webkit-transform-origin: 0 0;
+			transform-origin: 0 0;
 	position: relative;
 }
 
@@ -70,14 +72,17 @@ html, body {
 	right: 0;
 	width: 15em;
 	padding: .5em;
-	transition: 250ms ease all;
-	transform: translateX(15em);
+	-webkit-transition: 250ms ease all;
+			transition: 250ms ease all;
+	-webkit-transform: translateX(15em);
+			transform: translateX(15em);
 }
 
 	.controls .sm-open {
 	    margin-top: 0;
 	    margin-left: -3.3em;
-	    transition: 180ms ease all;
+	    -webkit-transition: 180ms ease all;
+	    		transition: 180ms ease all;
 	    width: 2em;
 	    text-align: center;
 	}
