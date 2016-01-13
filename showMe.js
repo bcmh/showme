@@ -7,6 +7,7 @@ var ShowMe = function() {
 
   // Settings
   _self.padding = 16;
+  _self.speed = 5000;
 
   // Selectors
   _self.Frame = document.getElementById('Frame');
@@ -76,7 +77,6 @@ ShowMe.prototype.stepSize = function() {
 
   var s = _self.sizes[_self.sizePointer];
 
-  console.log('Step size:', s);
   if (s) {
     _self.setSize( s.dimensions[0], s.dimensions[1] );
     console.log('New Size:', document.getElementById(s.id) );
@@ -89,7 +89,7 @@ ShowMe.prototype.stepSize = function() {
     _self.sizePointer++;
     _self.timer = setTimeout(function() {
       _self.stepSize();
-    }, 4000 );
+    }, _self.speed );
   }
 };
 
@@ -123,6 +123,7 @@ ShowMe.prototype.containDimensions = function ( child_w, child_h, container_w, c
   };
 };
 
+
 ShowMe.prototype.getUrl = function() {
 
   if (window.location.hash.length > 2) {
@@ -133,7 +134,7 @@ ShowMe.prototype.getUrl = function() {
 };
 
 ShowMe.prototype.setupUrl = function() {
-  var localUrl = window.localStorage.getItem('BCMHShowMeUrl');
+  var localUrl = window.localStorage.getItem('BCMH_ShowMeUrl');
   this.iFrame.src = localUrl || this.getUrl();
 
   if (localUrl)
@@ -142,22 +143,32 @@ ShowMe.prototype.setupUrl = function() {
 
 ShowMe.prototype.updateUrl = function() {
   this.iFrame.src = this.getUrl();
-  window.localStorage.setItem('BCMHShowMeUrl', this.getUrl() );
+  window.localStorage.setItem('BCMH_ShowMeUrl', this.getUrl() );
 };
 
 ShowMe.prototype.getSizes = function() {
-  var sizes = document.getElementById('Sizes').innerHTML;
-  var parts = sizes.split('|'),
+  var sizes = window.localStorage.getItem('BCMH_ShowMeSizes') || document.getElementById('Sizes').innerHTML;
+
+  var parts = sizes.split('\n').filter(function(r) { return r }),
       obj = [];
 
-  for (var i = 0; i < parts.length; i++) {
-    var s = parts[i].split('x');
+  if (parts.length) {
+    for (var i = 0; i < parts.length; i++) {
+      var s = parts[i].split('x');
+      obj.push({
+        'id'          : this.getID(s),
+        'dimensions'  : s
+      });
+    }
+  }
+ 
+  // Default size
+  if (obj.length === 0 ) {
     obj.push({
-      'id'          : this.getID(s),
-      'dimensions'  : s
+      id : 'default',
+      dimensions : [screen.width, screen.height]
     });
   }
-
   return obj;
 };
 
@@ -174,13 +185,9 @@ ShowMe.prototype.getSizesAsSelect = function() {
     sizes = this.getSizes(),
     counter = 1;
 
-  console.log('Sizes:', sizes );
-
   for (var i = 0; i < sizes.length; i++) {
-    var s = sizes[i];
-    console.log(s);
-    
-    inner += '<option id="' + s.id  + '" value="' + s.dimensions[0] + ',' + s.dimensions[1] + '">' + (i + 1) + '. ' + s.dimensions[0] + '&times' + s.dimensions[1] + 'px / ' + this.getPercentage(this.getScalar( {width: s.dimensions[0], height: s.dimensions[1]} )) + '%' + '</option>';
+    var s = sizes[i];    
+    inner += '<option id="' + s.id  + '" value="' + s.dimensions[0] + ',' + s.dimensions[1] + '">' + (i + 1) + '. ' + s.dimensions[0] + '&times' + s.dimensions[1] + 'px / scaled ' + this.getPercentage(this.getScalar( {width: s.dimensions[0], height: s.dimensions[1]} )) + '%' + '</option>';
   }
 
   select.innerHTML = inner;
@@ -214,12 +221,72 @@ ShowMe.prototype.getScalar = function( targetSize ) {
   }
 
   this.scalar = scalar;
-
   return scalar;
 };
 
 ShowMe.prototype.getPercentage = function(scalar) {
   return scalar === 1 ? 100 : (scalar * 100).toPrecision(2);
 };
+
+
+function handleDragOver(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+  evt.dataTransfer.dropEffect = 'copy';
+}
+
+function handleFileDrop(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+
+  var files = evt.dataTransfer.files;
+
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+
+    if (file.type === 'text/csv') {
+      dropZone.innerHTML = '<p>' + file.name + '</p>';
+      readCSV(file);
+    }
+  }
+}
+
+function readCSV(file) {
+  var fr = new FileReader();
+
+  fr.onload = (function(theFile) {
+    return function(e) {
+      var sizes = parseAnalyticsCSV(e.target.result);
+      window.SMCSV = e.target.result;
+
+        // Updating dom
+        document.getElementById('Sizes').innerHTML = sizes.join('\n');
+        window.localStorage.setItem('BCMH_ShowMeSizes', sizes.join('\n'));
+    }
+  })(file);
+
+  fr.readAsText(file);
+}
+
+function parseAnalyticsCSV( csvString ) {
+
+  if (!csvString.match('Screen Resolution')) {
+    return false;
+  }
+
+  var arr = csvString.split('\n').filter(function(r) {
+    return r.match(',') && r.match(/[0-9]+x[0-9]+/);
+  }).map(function(r) {
+    return r.split(',').shift();
+  });
+
+  return arr;
+}
+
+var dropZone = document.getElementById('FileUploader');
+
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileDrop, false);
+
 
 var s = new ShowMe();
