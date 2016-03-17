@@ -1,8 +1,8 @@
-/* globals console, document */
+/* globals console, document, FileReader, clearTimeout, setTimeout, window */
 'use strict';
 
 var ShowMe = function() {
-  
+
   var _self = this;
 
   // Settings
@@ -12,6 +12,7 @@ var ShowMe = function() {
   // Selectors
   _self.Frame = document.getElementById('Frame');
   _self.Details = document.getElementById('Details');
+  _self.Progress = document.querySelector('#Details progress');
   _self.Url = document.getElementById('Url');
   _self.iFrame = document.getElementById('iFrame');
   _self.update = document.getElementById('UpdateUrl');
@@ -19,29 +20,24 @@ var ShowMe = function() {
   _self.prev = document.getElementById('SPrev');
   _self.pause = document.getElementById('SPause');
   _self.Controls = document.getElementById('Controls');
-  _self.openControls = document.querySelector('.sm-open');
-  _self.closeControls = document.querySelector('.sm-close');
+
+  _self.state = {
+    pause : false
+  };
 
   _self.frameSize = {
     width: _self.Frame.offsetWidth,
     height: _self.Frame.offsetHeight
   };
 
-  _self.closeControls.addEventListener('click', function(evt) {
-    evt.preventDefault();
-    _self.Controls.classList.toggle('s__active');
-  });
-  _self.openControls.addEventListener('click', function(evt) {
-    evt.preventDefault();
-    _self.Controls.classList.toggle('s__active');
-  });
-
   _self.pause.addEventListener('click', function() {
     var inner = _self.pause.innerText.toLowerCase();
 
-    if ( inner === 'pause' ) {
-      clearTimeout(_self.timer);
+    if ( _self.state.pause === false ) {
+      _self.state.pause = true;
       _self.pause.innerText = 'play';
+
+      clearTimeout(_self.timer);
     } else {
       _self.pause.innerText = 'pause';
       _self.timer = _self.stepSize();
@@ -62,13 +58,21 @@ var ShowMe = function() {
   _self.Select = _self.getSizesAsSelect();
   _self.Details.appendChild(_self.Select);
 
+  _self.Progress.setAttribute('style', 'animation-duration:' + _self.speed + 'ms' );
+
   _self.Select.addEventListener('change', function(evt) {
     var si = evt.target.value.split(',');
     _self.setSize(si[0], si[1]);
   }, false);
 
+  _self.Url.addEventListener('keyup',function(evt) {
+    if (evt.code === 'Enter') {
+      _self.updateUrl();
+    }
+  }, false );
+
   _self.stepSize();
-  
+
   return this;
 };
 
@@ -79,11 +83,11 @@ ShowMe.prototype.stepSize = function() {
 
   if (s) {
     _self.setSize( s.dimensions[0], s.dimensions[1] );
-    console.log('New Size:', document.getElementById(s.id) );
-
     // Select latest item
     document.getElementById(s.id).setAttribute('selected',true);
   }
+
+  _self.Progress.classList.toggle('s__invert');
 
   if (_self.sizePointer < _self.sizes.length ) {
     _self.sizePointer++;
@@ -99,7 +103,7 @@ ShowMe.prototype.resize = function(w, h) {
     width: w,
     height: h
   };
-  
+
   _self.Frame.style.webkitTransform = 'scale(' + _self.getScalar( dimensions ) + ')';
 };
 
@@ -128,7 +132,7 @@ ShowMe.prototype.getUrl = function() {
 
   if (window.location.hash.length > 2) {
     return window.location.hash.replace('#', '');
-  } 
+  }
 
   return this.Url.value;
 };
@@ -161,7 +165,7 @@ ShowMe.prototype.getSizes = function() {
       });
     }
   }
- 
+
   // Default size
   if (obj.length === 0 ) {
     obj.push({
@@ -184,20 +188,25 @@ ShowMe.prototype.getSizesAsSelect = function() {
     inner = '',
     sizes = this.getSizes(),
     counter = 1;
+  console.log(sizes);
 
   for (var i = 0; i < sizes.length; i++) {
-    var s = sizes[i];    
-    inner += '<option id="' + s.id  + '" value="' + s.dimensions[0] + ',' + s.dimensions[1] + '">' + (i + 1) + '. ' + s.dimensions[0] + '&times' + s.dimensions[1] + 'px / scaled ' + this.getPercentage(this.getScalar( {width: s.dimensions[0], height: s.dimensions[1]} )) + '%' + '</option>';
+    var s = sizes[i],
+        size = {
+          width  : s.dimensions[0],
+          height : s.dimensions[1]
+        };
+
+    inner += '<option id="' + s.id  + '" value="' + s.dimensions.toString() + '">' + (i + 1) + '. ' + s.dimensions[0] + '&times' + s.dimensions[1] + 'px / scaled ' + this.getPercentage( this.getScalar( size ) ) + '</option>';
   }
 
   select.innerHTML = inner;
-
   return select;
 };
 
 /**
  *
- * 
+ *
  * @param  Array size
  * @return String
  */
@@ -206,14 +215,14 @@ ShowMe.prototype.getID = function(size) {
 };
 
 /**
- * 
- * 
+ *
+ *
  * @param  Array targetSize [description]
  * @return {[type]}            [description]
  */
 ShowMe.prototype.getScalar = function( targetSize ) {
   var scaleX = (window.innerWidth - this.padding * 2 ) / targetSize.width,
-      scaleY = (window.innerHeight - this.padding * 2 ) / targetSize.height,
+      scaleY = (window.innerHeight - this.padding * 5 ) / targetSize.height,
       scalar = this.min( scaleX, scaleY );
 
   if (scalar >= 1 ) {
@@ -225,9 +234,12 @@ ShowMe.prototype.getScalar = function( targetSize ) {
 };
 
 ShowMe.prototype.getPercentage = function(scalar) {
-  return scalar === 1 ? 100 : (scalar * 100).toPrecision(2);
+  return (scalar === 1 ? 100 : (scalar * 100).toPrecision(2)) + '%';
 };
 
+function handleDragEnter(evt) {
+  evt.target.classList.add('s__hover');
+}
 
 function handleDragOver(evt) {
   evt.stopPropagation();
@@ -247,6 +259,7 @@ function handleFileDrop(evt) {
     if (file.type === 'text/csv') {
       dropZone.innerHTML = '<p>' + file.name + '</p>';
       readCSV(file);
+      console.log('New CSV Loaded:', 'Reload');
     }
   }
 }
@@ -260,9 +273,9 @@ function readCSV(file) {
       window.SMCSV = e.target.result;
 
         // Updating dom
-        document.getElementById('Sizes').innerHTML = sizes.join('\n');
+        console.log('New Sizes loaded:', sizes );
         window.localStorage.setItem('BCMH_ShowMeSizes', sizes.join('\n'));
-    }
+    };
   })(file);
 
   fr.readAsText(file);
@@ -285,8 +298,9 @@ function parseAnalyticsCSV( csvString ) {
 
 var dropZone = document.getElementById('FileUploader');
 
-dropZone.addEventListener('dragover', handleDragOver, false);
-dropZone.addEventListener('drop', handleFileDrop, false);
+dropZone.addEventListener('dragover', handleDragOver, false );
+document.body.addEventListener('dragover', handleDragEnter, false );
 
+dropZone.addEventListener('drop', handleFileDrop, false);
 
 var s = new ShowMe();
