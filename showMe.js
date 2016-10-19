@@ -150,30 +150,122 @@ ShowMe.prototype.updateUrl = function() {
   window.localStorage.setItem('BCMH_ShowMeUrl', this.getUrl() );
 };
 
-ShowMe.prototype.getSizes = function() {
-  var sizes = window.localStorage.getItem('BCMH_ShowMeSizes') || document.getElementById('Sizes').innerHTML;
 
-  var parts = sizes.split('\n').filter(function(r) { return r }),
-      obj = [];
+
+ShowMe.prototype.getFromStore = function() {
+  var defaultItems = [
+    "768x1024",
+    "1920x1080",
+    "1440x900",
+    "375x667",
+    "1280x800",
+    "1366x768",
+    "320x568",
+    "2560x1440",
+    "360x640",
+    "1680x1050",
+    "1920x1200",
+    "1280x1024",
+    "1600x900",
+    "414x736",
+    "1024x768",
+    "1280x720",
+    "320x480",
+    "1536x864",
+    "2048x1152",
+    "1600x1200",
+    "1024x1366",
+    "412x732",
+    "800x600",
+    "1360x768",
+    "854x1366",
+    "1600x20000",
+    "600x960",
+    "800x1280",
+    "480x800",
+    "320x534",
+    "720x1280",
+    "360x592",
+    "960x600",
+    "1301x731",
+    "1440x960",
+    "2560x1600",
+    "1438x808",
+    "1518x853",
+    "600x1024",
+    "1093x614",
+    "1242x698",
+    "2133x1200",
+    "1024x819",
+    "1344x840",
+    "3440x1440",
+    "601x962",
+    "1829x1029",
+    "2560x1080",
+    "1024x600",
+    "1280x768",
+    "640x360",
+    "962x601",
+    "1600x1000",
+    "1706x960",
+    "320x570",
+    "1280x752",
+    "1371x771",
+    "1280x960",
+    "1536x960",
+    "640x480",
+    "1080x1920",
+    "1152x720",
+    "1422x800",
+    "1670x939",
+    "1707x960",
+    "230x285",
+    "403x716",
+    "1152x864",
+    "1188x668",
+    "1455x818",
+    "2021x1137",
+    "2259x1271",
+    "3200x1800",
+    "480x854",
+    "505x505"
+  ];
+
+  // If stored in localStorage
+  //
+  // var sizes = window.localStorage.getItem('BCMH_ShowMeSizes') || document.getElementById('Sizes').innerHTML;
+  //     sizes = sizes.split('\n').filter(function(r) { return r });
+
+  return defaultItems;
+};
+
+/**
+ *
+ *
+ * @return array of objects {id, dimensions}
+ */
+ShowMe.prototype.getSizes = function() {
+  var parts = this.getFromStore(),
+      arr = [];
 
   if (parts.length) {
     for (var i = 0; i < parts.length; i++) {
       var s = parts[i].split('x');
-      obj.push({
+      arr.push({
         'id'          : this.getID(s),
         'dimensions'  : s
       });
     }
   }
 
-  // Default size
-  if (obj.length === 0 ) {
-    obj.push({
+  // Default sizes
+  if (arr.length === 0 ) {
+    arr.push({
       id : 'default',
       dimensions : [screen.width, screen.height]
     });
   }
-  return obj;
+  return arr;
 };
 
 ShowMe.prototype.setSize = function(w, h) {
