@@ -116,7 +116,7 @@ body {
 .controls-inline select {
 	background: #fff;
 	border: 0;
-	padding: 1em 1.3em;
+	padding: 1em 2em 1em 1.3em;
 	border-radius: 0;
 	font-family: sans-serif;
 	box-sizing: border-box;
@@ -208,4 +208,14 @@ input[type="submit"] {
 		z-index: 1;
 		-webkit-appearance: input;
 		text-indent: 1em;;
+	}
+
+	#Favicon {
+		position: absolute;
+		top: 1.5em;
+		left: 1em;
+	}
+
+	#Url {
+		padding-left: 2.5em;
 	}

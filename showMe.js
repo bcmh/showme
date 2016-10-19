@@ -11,6 +11,7 @@ var ShowMe = function() {
 
   // Selectors
   _self.Frame = document.getElementById('Frame');
+  _self.Favicon = document.getElementById('Favicon');
   _self.Details = document.getElementById('Details');
   _self.Progress = document.querySelector('#Details progress');
   _self.Url = document.getElementById('Url');
@@ -21,8 +22,7 @@ var ShowMe = function() {
   _self.pause = document.getElementById('SPause');
   _self.Controls = document.getElementById('Controls');
 
-  _self.state = {
-    pause : false
+  _self.state = {    pause : false
   };
 
   _self.frameSize = {
@@ -38,6 +38,7 @@ var ShowMe = function() {
       _self.pause.innerText = 'play';
 
       clearTimeout(_self.timer);
+
     } else {
       _self.pause.innerText = 'pause';
       _self.timer = _self.stepSize();
@@ -45,7 +46,7 @@ var ShowMe = function() {
   }, false);
 
   _self.update.addEventListener('click', function() {
-    _self.updateUrl();
+    _self.updateUrl(_self.getUrl());
   }, false );
 
   _self.setupUrl();
@@ -67,7 +68,7 @@ var ShowMe = function() {
 
   _self.Url.addEventListener('keyup',function(evt) {
     if (evt.code === 'Enter') {
-      _self.updateUrl();
+      _self.updateUrl(_self.getUrl());
     }
   }, false );
 
@@ -77,9 +78,8 @@ var ShowMe = function() {
 };
 
 ShowMe.prototype.stepSize = function() {
-  var _self = this;
-
-  var s = _self.sizes[_self.sizePointer];
+  var _self = this
+      s = _self.sizes[_self.sizePointer];
 
   if (s) {
     _self.setSize( s.dimensions[0], s.dimensions[1] );
@@ -89,11 +89,15 @@ ShowMe.prototype.stepSize = function() {
 
   _self.Progress.classList.toggle('s__invert');
 
-  if (_self.sizePointer < _self.sizes.length ) {
+  if ( _self.sizePointer < _self.sizes.length ) {
     _self.sizePointer++;
     _self.timer = setTimeout(function() {
       _self.stepSize();
     }, _self.speed );
+  } else {
+    console.log('End!');
+    clearTimeout( _self.timer );
+    _self.sizePointer = 0;
   }
 };
 
@@ -137,17 +141,28 @@ ShowMe.prototype.getUrl = function() {
   return this.Url.value;
 };
 
+ShowMe.prototype.normalizeUrl = function(url) {
+
+  if (!url.match(/^http/)) {
+    return 'http://' + url;
+  }
+
+  return url;
+}
+
 ShowMe.prototype.setupUrl = function() {
   var localUrl = window.localStorage.getItem('BCMH_ShowMeUrl');
-  this.iFrame.src = localUrl || this.getUrl();
+
+  this.updateUrl( localUrl || this.getUrl() );
 
   if (localUrl)
     this.Url.value = localUrl;
 };
 
-ShowMe.prototype.updateUrl = function() {
-  this.iFrame.src = this.getUrl();
-  window.localStorage.setItem('BCMH_ShowMeUrl', this.getUrl() );
+ShowMe.prototype.updateUrl = function(url) {
+  this.iFrame.src = this.normalizeUrl(url);
+  this.Favicon.src = 'https://www.google.com/s2/favicons?domain=' + url;
+  window.localStorage.setItem('BCMH_ShowMeUrl', url );
 };
 
 
@@ -236,7 +251,7 @@ ShowMe.prototype.getFromStore = function() {
   // var sizes = window.localStorage.getItem('BCMH_ShowMeSizes') || document.getElementById('Sizes').innerHTML;
   //     sizes = sizes.split('\n').filter(function(r) { return r });
 
-  return defaultItems;
+  return defaultItems.slice(0,4);
 };
 
 /**
@@ -289,7 +304,7 @@ ShowMe.prototype.getSizesAsSelect = function() {
           height : s.dimensions[1]
         };
 
-    inner += '<option id="' + s.id  + '" value="' + s.dimensions.toString() + '">' + (i + 1) + '. ' + s.dimensions[0] + '&times' + s.dimensions[1] + 'px / scaled ' + this.getPercentage( this.getScalar( size ) ) + '</option>';
+    inner += '<option id="' + s.id  + '" value="' + s.dimensions.toString() + '">' + (i + 1) + '. ' + s.dimensions[0] + '&times' + s.dimensions[1] + 'px - Scaled ' + this.getPercentage( this.getScalar( size ) ) + '</option>';
   }
 
   select.innerHTML = inner;
@@ -313,8 +328,9 @@ ShowMe.prototype.getID = function(size) {
  * @return {[type]}            [description]
  */
 ShowMe.prototype.getScalar = function( targetSize ) {
+
   var scaleX = (window.innerWidth - this.padding * 2 ) / targetSize.width,
-      scaleY = (window.innerHeight - this.padding * 5 ) / targetSize.height,
+      scaleY = (window.innerHeight - this.padding * 6 ) / targetSize.height,
       scalar = this.min( scaleX, scaleY );
 
   if (scalar >= 1 ) {
