@@ -246,12 +246,15 @@ ShowMe.prototype.getFromStore = function() {
     "505x505"
   ];
 
-  // If stored in localStorage
-  //
-  // var sizes = window.localStorage.getItem('BCMH_ShowMeSizes') || document.getElementById('Sizes').innerHTML;
-  //     sizes = sizes.split('\n').filter(function(r) { return r });
 
-  return defaultItems.slice(0,4);
+  var sizes = window.localStorage.getItem('BCMH_ShowMeSizes');
+
+  // If stored in localStorage
+  if (sizes) {
+    return sizes.split('\n').filter(function(r) { return r });
+  }
+
+  return defaultItems;
 };
 
 /**
