@@ -22,7 +22,10 @@ var ShowMe = function() {
   _self.pause = document.getElementById('SPause');
   _self.Controls = document.getElementById('Controls');
 
-  _self.state = {    pause : false
+  _self.timer = false;
+
+  _self.state = {
+    pause : false
   };
 
   _self.frameSize = {
@@ -33,16 +36,32 @@ var ShowMe = function() {
   _self.pause.addEventListener('click', function() {
     var inner = _self.pause.innerText.toLowerCase();
 
+
     if ( _self.state.pause === false ) {
       _self.state.pause = true;
       _self.pause.innerText = 'play';
 
-      clearTimeout(_self.timer);
+      document.body.className = 's__is-paused';
 
-    } else {
-      _self.pause.innerText = 'pause';
-      _self.timer = _self.stepSize();
+      clearTimeout(_self.timer);
+      _self.timer = false;
+      console.log('Pause:', _self.timer);
+      return;
     }
+
+    if ( _self.state.pause === true ) {
+      console.log('Unpause', _self.timer );
+      _self.state.pause = false;
+      _self.pause.innerText = 'pause';
+
+      document.body.className = '';
+
+      if (!_self.timer) {
+        _self.stepSize();
+      }
+      return;
+    }
+
   }, false);
 
   _self.update.addEventListener('click', function() {
