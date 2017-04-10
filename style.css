@@ -8,6 +8,7 @@ html,
 body {
 	background: #eee;
 	overflow: hidden;
+        min-height: 100vh;
 	background-image:
       -moz-linear-gradient(45deg, #ddd 25%, transparent 25%),
       -moz-linear-gradient(-45deg, #ddd 25%, transparent 25%),
@@ -30,14 +31,11 @@ body {
 	background: rgba(255,0,0,0.5);
 	width: 10em;
 	height: 20em;
-	top: 1em;
-	left: 1em;
 	box-shadow: 0 .5em 1.5em rgba( 0, 0, 0,.25);
 	-webkit-transition: 280ms ease-out all, 260ms ease-out transform;
 			transition: 280ms ease-out all, 260ms ease-out transform;
 	-webkit-transform-origin: 0 0;
 			transform-origin: 0 0;
-	position: relative;
 }
 
 #Frame iframe {
@@ -54,6 +52,7 @@ body {
 
 .fr-wrap {
 	display: inline-block;
+        margin: 1em;
 }
 
 #InlineControls {
