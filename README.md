@@ -1,15 +1,23 @@
-# Show Me
-__Because sometimes just talking about it is not enough.__
+👀 Show Me
+__Because sometimes just talking about different screen sizes is not enough.__
 
-### Getting some data to work with from Google Analytics
+
+Getting screenshot data
+---
+
+__Google Analytics__
 
 * Audience > Technology & OS
 * Change the primary dimension to Screen Resolution
 * Adjust the timeframe
 * Export to CSV
 
-### Todos
+Roadmap
+---
 
 * Add prev/pause/next button for skipping through the sizes
 * UIifying
-* Pull/store within localStorage
+
+<a href="https://www.netlify.com">
+  <img src="https://www.netlify.com/img/global/badges/netlify-light.svg"/>
+</a>
