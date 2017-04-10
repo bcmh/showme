@@ -1,5 +1,6 @@
 👀 Show Me
-__Because sometimes just talking about different screen sizes is not enough.__
+
+Because sometimes just talking about different screen sizes is not enough.
 
 
 Getting screenshot data
