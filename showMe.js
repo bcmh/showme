@@ -1,8 +1,7 @@
 /* globals console, document, FileReader, clearTimeout, setTimeout, window */
-'use strict';
+"use strict";
 
 var ShowMe = function() {
-
   var _self = this;
 
   // Settings
@@ -10,22 +9,22 @@ var ShowMe = function() {
   _self.speed = 5000;
 
   // Selectors
-  _self.Frame = document.getElementById('Frame');
-  _self.Favicon = document.getElementById('Favicon');
-  _self.Details = document.getElementById('Details');
-  _self.Progress = document.querySelector('#Details progress');
-  _self.Url = document.getElementById('Url');
-  _self.iFrame = document.getElementById('iFrame');
-  _self.update = document.getElementById('UpdateUrl');
-  _self.next = document.getElementById('SNext');
-  _self.prev = document.getElementById('SPrev');
-  _self.pause = document.getElementById('SPause');
-  _self.Controls = document.getElementById('Controls');
+  _self.Frame = document.getElementById("Frame");
+  _self.Favicon = document.getElementById("Favicon");
+  _self.Details = document.getElementById("Details");
+  _self.Progress = document.querySelector("#Details progress");
+  _self.Url = document.getElementById("Url");
+  _self.iFrame = document.getElementById("iFrame");
+  _self.update = document.getElementById("UpdateUrl");
+  _self.next = document.getElementById("SNext");
+  _self.prev = document.getElementById("SPrev");
+  _self.pause = document.getElementById("SPause");
+  _self.Controls = document.getElementById("Controls");
 
   _self.timer = false;
 
   _self.state = {
-    pause : false
+    pause: false
   };
 
   _self.frameSize = {
@@ -33,40 +32,46 @@ var ShowMe = function() {
     height: _self.Frame.offsetHeight
   };
 
-  _self.pause.addEventListener('click', function() {
-    var inner = _self.pause.innerText.toLowerCase();
+  _self.pause.addEventListener(
+    "click",
+    function() {
+      var inner = _self.pause.innerText.toLowerCase();
 
+      if (_self.state.pause === false) {
+        _self.state.pause = true;
+        _self.pause.innerText = "play";
 
-    if ( _self.state.pause === false ) {
-      _self.state.pause = true;
-      _self.pause.innerText = 'play';
+        document.body.className = "s__is-paused";
 
-      document.body.className = 's__is-paused';
-
-      clearTimeout(_self.timer);
-      _self.timer = false;
-      console.log('Pause:', _self.timer);
-      return;
-    }
-
-    if ( _self.state.pause === true ) {
-      console.log('Unpause', _self.timer );
-      _self.state.pause = false;
-      _self.pause.innerText = 'pause';
-
-      document.body.className = '';
-
-      if (!_self.timer) {
-        _self.stepSize();
+        clearTimeout(_self.timer);
+        _self.timer = false;
+        console.log("Pause:", _self.timer);
+        return;
       }
-      return;
-    }
 
-  }, false);
+      if (_self.state.pause === true) {
+        console.log("Unpause", _self.timer);
+        _self.state.pause = false;
+        _self.pause.innerText = "pause";
 
-  _self.update.addEventListener('click', function() {
-    _self.updateUrl(_self.getUrl());
-  }, false );
+        document.body.className = "";
+
+        if (!_self.timer) {
+          _self.stepSize();
+        }
+        return;
+      }
+    },
+    false
+  );
+
+  _self.update.addEventListener(
+    "click",
+    function() {
+      _self.updateUrl(_self.getUrl());
+    },
+    false
+  );
 
   _self.setupUrl();
 
@@ -78,18 +83,37 @@ var ShowMe = function() {
   _self.Select = _self.getSizesAsSelect();
   _self.Details.appendChild(_self.Select);
 
-  _self.Progress.setAttribute('style', 'animation-duration:' + _self.speed + 'ms' );
+  _self.Progress.setAttribute(
+    "style",
+    "animation-duration:" + _self.speed + "ms"
+  );
 
-  _self.Select.addEventListener('change', function(evt) {
-    var si = evt.target.value.split(',');
-    _self.setSize(si[0], si[1]);
-  }, false);
+  _self.Select.addEventListener(
+    "change",
+    function(evt) {
+      var si = evt.target.value.split(",");
+      _self.setSize(si[0], si[1]);
+      evt.target.querySelectorAll("option").forEach(function(el, idx) {
+        //console.log(el);
 
-  _self.Url.addEventListener('keyup',function(evt) {
-    if (evt.code === 'Enter') {
-      _self.updateUrl(_self.getUrl());
-    }
-  }, false );
+        if (el.getAttribute("value") === evt.target.value) {
+          console.log("Current element is:", idx);
+          _self.sizePointer = idx;
+        }
+      });
+    },
+    false
+  );
+
+  _self.Url.addEventListener(
+    "keyup",
+    function(evt) {
+      if (evt.code === "Enter") {
+        _self.updateUrl(_self.getUrl());
+      }
+    },
+    false
+  );
 
   _self.stepSize();
 
@@ -97,25 +121,25 @@ var ShowMe = function() {
 };
 
 ShowMe.prototype.stepSize = function() {
-  var _self = this
-      s = _self.sizes[_self.sizePointer];
+  var _self = this;
+  s = _self.sizes[_self.sizePointer];
 
   if (s) {
-    _self.setSize( s.dimensions[0], s.dimensions[1] );
+    _self.setSize(s.dimensions[0], s.dimensions[1]);
     // Select latest item
-    document.getElementById(s.id).setAttribute('selected',true);
+    document.getElementById(s.id).setAttribute("selected", true);
   }
 
-  _self.Progress.classList.toggle('s__invert');
+  _self.Progress.classList.toggle("s__invert");
 
-  if ( _self.sizePointer < _self.sizes.length ) {
+  if (_self.sizePointer < _self.sizes.length) {
     _self.sizePointer++;
     _self.timer = setTimeout(function() {
       _self.stepSize();
-    }, _self.speed );
+    }, _self.speed);
   } else {
-    console.log('End!');
-    clearTimeout( _self.timer );
+    console.log("End!");
+    clearTimeout(_self.timer);
     _self.sizePointer = 0;
   }
 };
@@ -127,14 +151,15 @@ ShowMe.prototype.resize = function(w, h) {
     height: h
   };
 
-  _self.Frame.style.webkitTransform = 'scale(' + _self.getScalar( dimensions ) + ')';
+  _self.Frame.style.webkitTransform =
+    "scale(" + _self.getScalar(dimensions) + ")";
 };
 
-ShowMe.prototype.min = function( a, b ) {
+ShowMe.prototype.min = function(a, b) {
   return a > b ? b : a;
 };
 
-ShowMe.prototype.max = function( a, b ) {
+ShowMe.prototype.max = function(a, b) {
   return a < b ? b : a;
 };
 
@@ -142,49 +167,48 @@ ShowMe.prototype.map = function(value, istart, istop, ostart, ostop) {
   return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 };
 
-ShowMe.prototype.containDimensions = function ( child_w, child_h, container_w, container_h ) {
-  var scale_factor = this.min( container_w / child_w, container_h / child_h );
+ShowMe.prototype.containDimensions = function(
+  child_w,
+  child_h,
+  container_w,
+  container_h
+) {
+  var scale_factor = this.min(container_w / child_w, container_h / child_h);
   return {
     width: child_w * scale_factor,
-    height: child_h * scale_factor,
+    height: child_h * scale_factor
   };
 };
 
-
 ShowMe.prototype.getUrl = function() {
-
   if (window.location.hash.length > 2) {
-    return window.location.hash.replace('#', '');
+    return window.location.hash.replace("#", "");
   }
 
   return this.Url.value;
 };
 
 ShowMe.prototype.normalizeUrl = function(url) {
-
   if (!url.match(/^http/)) {
-    return 'http://' + url;
+    return "http://" + url;
   }
 
   return url;
-}
+};
 
 ShowMe.prototype.setupUrl = function() {
-  var localUrl = window.localStorage.getItem('BCMH_ShowMeUrl');
+  var localUrl = window.localStorage.getItem("BCMH_ShowMeUrl");
 
-  this.updateUrl( localUrl || this.getUrl() );
+  this.updateUrl(localUrl || this.getUrl());
 
-  if (localUrl)
-    this.Url.value = localUrl;
+  if (localUrl) this.Url.value = localUrl;
 };
 
 ShowMe.prototype.updateUrl = function(url) {
   this.iFrame.src = this.normalizeUrl(url);
-  this.Favicon.src = 'https://www.google.com/s2/favicons?domain=' + url;
-  window.localStorage.setItem('BCMH_ShowMeUrl', url );
+  this.Favicon.src = "https://www.google.com/s2/favicons?domain=" + url;
+  window.localStorage.setItem("BCMH_ShowMeUrl", url);
 };
-
-
 
 ShowMe.prototype.getFromStore = function() {
   var defaultItems = [
@@ -265,12 +289,13 @@ ShowMe.prototype.getFromStore = function() {
     "505x505"
   ];
 
-
-  var sizes = window.localStorage.getItem('BCMH_ShowMeSizes');
+  var sizes = window.localStorage.getItem("BCMH_ShowMeSizes");
 
   // If stored in localStorage
   if (sizes) {
-    return sizes.split('\n').filter(function(r) { return r });
+    return sizes.split("\n").filter(function(r) {
+      return r;
+    });
   }
 
   return defaultItems;
@@ -283,51 +308,55 @@ ShowMe.prototype.getFromStore = function() {
  */
 ShowMe.prototype.getSizes = function() {
   var parts = this.getFromStore(),
-      arr = [];
+    arr = [];
 
   if (parts.length) {
     for (var i = 0; i < parts.length; i++) {
-      var s = parts[i].split('x');
+      var s = parts[i].split("x");
       arr.push({
-        'id'          : this.getID(s),
-        'dimensions'  : s
+        id: this.getID(s),
+        dimensions: s
       });
     }
   }
 
   // Default sizes
-  if (arr.length === 0 ) {
+  if (arr.length === 0) {
     arr.push({
-      id : 'default',
-      dimensions : [screen.width, screen.height]
+      id: "default",
+      dimensions: [screen.width, screen.height]
     });
   }
   return arr;
 };
 
 ShowMe.prototype.setSize = function(w, h) {
-  this.Frame.style.width = w + 'px';
-  this.Frame.style.height = h + 'px';
+  this.Frame.style.width = w + "px";
+  this.Frame.style.height = h + "px";
 
   this.resize(w, h);
 };
 
 ShowMe.prototype.getSizesAsSelect = function() {
-  var select = document.createElement('select'),
-    inner = '',
+  var _self = this,
+    select = document.createElement("select"),
+    inner = "",
     sizes = this.getSizes(),
     counter = 1;
   console.log(sizes);
 
-  for (var i = 0; i < sizes.length; i++) {
-    var s = sizes[i],
-        size = {
-          width  : s.dimensions[0],
-          height : s.dimensions[1]
-        };
+  sizes.map(function(s, i) {
+    var size = {
+      width: s.dimensions[0],
+      height: s.dimensions[1]
+    };
 
-    inner += '<option id="' + s.id  + '" value="' + s.dimensions.toString() + '">' + (i + 1) + '. ' + s.dimensions[0] + '&times' + s.dimensions[1] + 'px - Scaled ' + this.getPercentage( this.getScalar( size ) ) + '</option>';
-  }
+    var number = i + 1;
+    var scaled = _self.getPercentage(_self.getScalar(size));
+    var label = `${number}. ${size.width} &times ${size.height}px - Scaled ${scaled}`;
+
+    inner += `<option id="${s.id}" value="${s.dimensions.toString()}">${label}</option>`;
+  });
 
   select.innerHTML = inner;
   return select;
@@ -340,7 +369,7 @@ ShowMe.prototype.getSizesAsSelect = function() {
  * @return String
  */
 ShowMe.prototype.getID = function(size) {
-  return 's' + size[0] + 'x' + size[1];
+  return "s" + size[0] + "x" + size[1];
 };
 
 /**
@@ -349,13 +378,12 @@ ShowMe.prototype.getID = function(size) {
  * @param  Array targetSize [description]
  * @return {[type]}            [description]
  */
-ShowMe.prototype.getScalar = function( targetSize ) {
+ShowMe.prototype.getScalar = function(targetSize) {
+  var scaleX = (window.innerWidth - this.padding * 2) / targetSize.width,
+    scaleY = (window.innerHeight - this.padding * 6) / targetSize.height,
+    scalar = this.min(scaleX, scaleY);
 
-  var scaleX = (window.innerWidth - this.padding * 2 ) / targetSize.width,
-      scaleY = (window.innerHeight - this.padding * 6 ) / targetSize.height,
-      scalar = this.min( scaleX, scaleY );
-
-  if (scalar >= 1 ) {
+  if (scalar >= 1) {
     scalar = 1;
   }
 
@@ -364,17 +392,17 @@ ShowMe.prototype.getScalar = function( targetSize ) {
 };
 
 ShowMe.prototype.getPercentage = function(scalar) {
-  return (scalar === 1 ? 100 : (scalar * 100).toPrecision(2)) + '%';
+  return (scalar === 1 ? 100 : (scalar * 100).toPrecision(2)) + "%";
 };
 
 function handleDragEnter(evt) {
-  evt.target.classList.add('s__hover');
+  evt.target.classList.add("s__hover");
 }
 
 function handleDragOver(evt) {
   evt.stopPropagation();
   evt.preventDefault();
-  evt.dataTransfer.dropEffect = 'copy';
+  evt.dataTransfer.dropEffect = "copy";
 }
 
 function handleFileDrop(evt) {
@@ -386,10 +414,10 @@ function handleFileDrop(evt) {
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
 
-    if (file.type === 'text/csv') {
-      dropZone.innerHTML = '<p>' + file.name + '</p>';
+    if (file.type === "text/csv") {
+      dropZone.innerHTML = "<p>" + file.name + "</p>";
       readCSV(file);
-      console.log('New CSV Loaded:', 'Reload');
+      console.log("New CSV Loaded:", "Reload");
     }
   }
 }
@@ -402,35 +430,37 @@ function readCSV(file) {
       var sizes = parseAnalyticsCSV(e.target.result);
       window.SMCSV = e.target.result;
 
-        // Updating dom
-        console.log('New Sizes loaded:', sizes );
-        window.localStorage.setItem('BCMH_ShowMeSizes', sizes.join('\n'));
+      // Updating dom
+      console.log("New Sizes loaded:", sizes);
+      window.localStorage.setItem("BCMH_ShowMeSizes", sizes.join("\n"));
     };
   })(file);
 
   fr.readAsText(file);
 }
 
-function parseAnalyticsCSV( csvString ) {
-
-  if (!csvString.match('Screen Resolution')) {
+function parseAnalyticsCSV(csvString) {
+  if (!csvString.match("Screen Resolution")) {
     return false;
   }
 
-  var arr = csvString.split('\n').filter(function(r) {
-    return r.match(',') && r.match(/[0-9]+x[0-9]+/);
-  }).map(function(r) {
-    return r.split(',').shift();
-  });
+  var arr = csvString
+    .split("\n")
+    .filter(function(r) {
+      return r.match(",") && r.match(/[0-9]+x[0-9]+/);
+    })
+    .map(function(r) {
+      return r.split(",").shift();
+    });
 
   return arr;
 }
 
-var dropZone = document.getElementById('FileUploader');
+var dropZone = document.getElementById("FileUploader");
 
-dropZone.addEventListener('dragover', handleDragOver, false );
-document.body.addEventListener('dragover', handleDragEnter, false );
+dropZone.addEventListener("dragover", handleDragOver, false);
+document.body.addEventListener("dragover", handleDragEnter, false);
 
-dropZone.addEventListener('drop', handleFileDrop, false);
+dropZone.addEventListener("drop", handleFileDrop, false);
 
 var s = new ShowMe();
