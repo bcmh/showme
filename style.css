@@ -32,8 +32,8 @@ body {
 	width: 10em;
 	height: 20em;
 	box-shadow: 0 .5em 1.5em rgba( 0, 0, 0,.25);
-	-webkit-transition: 280ms ease-out all, 260ms ease-out transform;
-			transition: 280ms ease-out all, 260ms ease-out transform;
+	-webkit-transition: 380ms ease-out all, 360ms ease-out transform;
+			transition: 380ms ease-out all, 360ms ease-out transform;
 	-webkit-transform-origin: 0 0;
 			transform-origin: 0 0;
 }
@@ -109,17 +109,22 @@ body {
 		text-decoration: none;
 	}
 
+	#SPause {
+		min-width: 4.1em;
+		text-transform: capitalize;
+	}
+
 
 .controls-inline button,
 .controls-inline input,
 .controls-inline select {
 	background: #fff;
 	border: 0;
-	padding: 1em 2em 1em 1.3em;
+	padding: 0;
 	border-radius: 0;
 	font-family: sans-serif;
 	box-sizing: border-box;
-	height: 3.5em;
+	height: 2.5em;
 	font-size: 16px;
 }
 
@@ -212,7 +217,7 @@ input[type="submit"] {
 
 	#Favicon {
 		position: absolute;
-		top: 1.5em;
+    	top: 30%;
 		left: 1em;
 	}
 
